@@ -19,4 +19,12 @@ async Show(@Body() FormData:Auth):Promise<any>{
     const result=await this.Auth.SignUP(UserData)
     return result; /// this will contain the actual result of the query
 }
+
+ @Post('/Login')
+  async login(@Body() formData: { email: string; password: string }) {
+    return this.Auth.Login(formData);
+  }
+
+
+
 }

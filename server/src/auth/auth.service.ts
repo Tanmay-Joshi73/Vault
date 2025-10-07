@@ -42,4 +42,38 @@ export class AuthService {
         }
         return false;
   }
+
+    // ------------------- LOGIN -------------------
+  async Login(Data: { email: string; password: string }): Promise<any> {
+    const { email, password } = Data;
+
+    // 1️⃣ Find user by email
+    const user = await this.userModel.findOne({ email });
+    if (!user) {
+      return {
+        Message: "Invalid email or password",
+        Status: false,
+        StatusCode: 401,
+      };
+    }
+
+    // 2️⃣ Compare encrypted passwords directly
+    if (user.password !== password) {
+      return {
+        Message: "Invalid email or password",
+        Status: false,
+        StatusCode: 401,
+      };
+    }
+
+    // 3️⃣ Login successful
+    return {
+      Message: "Login Successful",
+      Status: true,
+      StatusCode: 200,
+      User: { email: user.email }, // return basic user info
+    };
+  }
 }
+
+
