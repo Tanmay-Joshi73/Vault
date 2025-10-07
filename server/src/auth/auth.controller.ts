@@ -21,10 +21,13 @@ async Show(@Body() FormData:Auth):Promise<any>{
 }
 
  @Post('/Login')
-  async login(@Body() formData: { email: string; password: string }) {
+  async login(@Body() formData: { email: string; masterPassword: string }) {
     return this.Auth.Login(formData);
   }
-
+  @Get('/FindAll')
+  async GetAll():Promise<any>{
+    return this.Auth.GetAll();
+  }
 
 
 }

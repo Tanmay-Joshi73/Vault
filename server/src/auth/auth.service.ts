@@ -44,9 +44,13 @@ export class AuthService {
   }
 
     // ------------------- LOGIN -------------------
-  async Login(Data: { email: string; password: string }): Promise<any> {
-    const { email, password } = Data;
-
+  async Login(Data: { email: string; masterPassword: string }): Promise<any> {
+    
+    const {email,masterPassword}={...Data}
+    console.log(masterPassword)
+    // return ;
+    
+    // return; 
     // 1️⃣ Find user by email
     const user = await this.userModel.findOne({ email });
     if (!user) {
@@ -58,7 +62,7 @@ export class AuthService {
     }
 
     // 2️⃣ Compare encrypted passwords directly
-    if (user.password !== password) {
+    if (user.password !== masterPassword) {
       return {
         Message: "Invalid email or password",
         Status: false,
@@ -74,6 +78,16 @@ export class AuthService {
       User: { email: user.email }, // return basic user info
     };
   }
-}
 
+  async GetAll():Promise<any>{
+    try{
+        const users=await this .userModel.find();
+        return users;
+  }
+  catch(err){
+    console.log(err);
+
+  }
+}
+}
 
