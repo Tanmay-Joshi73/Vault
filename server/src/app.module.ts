@@ -8,7 +8,7 @@ import { Throttle,ThrottlerGuard,ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 @Module({
   imports: [AuthModule, UserModule,
-    MongooseModule.forRoot("mongodb://localhost:27017"),
+    MongooseModule.forRoot("mongodb+srv://tanmayjoshi072_db_user:L5bdMXoS55yUOYx2@vaultcluster.7q3th0j.mongodb.net/"),
     ThrottlerModule.forRoot([
         {
         name: 'short',
