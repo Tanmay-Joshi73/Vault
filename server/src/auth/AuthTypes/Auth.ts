@@ -8,3 +8,4 @@ export interface SignUpResponce{
         Status:boolean,
         StatusCode:Number
     }
+

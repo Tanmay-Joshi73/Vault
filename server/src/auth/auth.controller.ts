@@ -1,8 +1,8 @@
 import { Controller } from '@nestjs/common';
 import { Get,Body,Post} from '@nestjs/common';
 import  {Auth} from './DTOs/auth.dto';
-import { SignUp,SignUpResponce } from './AuthTypes/Auth';
-// import {  } from '@nestjs/common';
+import { SignUp,SignUpResponce } from './AuthTypes/Auth';;
+import { vaultData } from './DTOs/vaultData.dto';
 import { AuthService } from './auth.service';
 @Controller('auth')
 export class AuthController {
@@ -26,8 +26,13 @@ async Show(@Body() FormData:Auth):Promise<any>{
   }
   @Get('/FindAll')
   async GetAll():Promise<any>{
+
+  
+    console.log("Hey i am inside the FindAll Route")
     return this.Auth.GetAll();
   }
+
+
 
 
 }
