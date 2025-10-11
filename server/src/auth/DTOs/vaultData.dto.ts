@@ -1,9 +1,14 @@
-import { IsString,isBoolean } from "class-validator";
+import { IsString,isBoolean, isString } from "class-validator";
+import { Types } from "mongoose";
 export class vaultData{
 @IsString()
 username:string
 @IsString()
-url:string
+website:string
 @IsString()
-password:string
+encryptedPassword:string
+@IsString()
+folder:string
+@IsString()
+email:string
 }

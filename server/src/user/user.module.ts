@@ -6,7 +6,8 @@ import { Vault,VaultSchema } from './Schemas/vault.schema';
 import { MongooseModule } from '@nestjs/mongoose';
 @Module({
   imports:[
-    MongooseModule.forFeature([{name:Vault.name,schema:VaultSchema}])
+    MongooseModule.forFeature([{name:Vault.name,schema:VaultSchema}]),
+    MongooseModule.forFeature([{name:User.name,schema:UserSchema}])
   ],
   controllers: [UserController],
   providers: [UserService]

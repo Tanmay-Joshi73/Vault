@@ -22,7 +22,8 @@ async Show(@Body() FormData:Auth):Promise<any>{
 
  @Post('/Login')
   async login(@Body() formData: { email: string; masterPassword: string }) {
-    return this.Auth.Login(formData);
+    const response=await this.Auth.Login(formData);
+    return response;
   }
   @Get('/FindAll')
   async GetAll():Promise<any>{

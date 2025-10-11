@@ -17,15 +17,19 @@ export class AuthService {
             Message:"Email is already registared",
             Status:false,
             StatusCode:409
+            
+
         }
         
     }
     const user= new this.userModel({email:email,password:password})
+ 
+    // console.log('user id is ',id)
     await user.save();     // this will create the user in the Database;
     return {
             Message:"Successsful",
             Status:true,
-            StatusCode:202
+            StatusCode:202,
              }
   }
   async CheckEmail(email:string):Promise<boolean>{
@@ -44,7 +48,7 @@ export class AuthService {
   }
 
     // ------------------- LOGIN -------------------
-  async Login(Data: { email: string; masterPassword: string }): Promise<any> {
+  async Login(Data: { email: string; masterPassword: string }): Promise<SignUpResponce> {
     
     const {email,masterPassword}={...Data}
     console.log(masterPassword)
@@ -53,6 +57,7 @@ export class AuthService {
     // return; 
     // 1️⃣ Find user by email
     const user = await this.userModel.findOne({ email });
+  
     if (!user) {
       return {
         Message: "Invalid email or password",
@@ -75,7 +80,7 @@ export class AuthService {
       Message: "Login Successful",
       Status: true,
       StatusCode: 200,
-      User: { email: user.email }, // return basic user info
+   
     };
   }
 
