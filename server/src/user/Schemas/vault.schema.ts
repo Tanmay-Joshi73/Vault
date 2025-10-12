@@ -9,6 +9,8 @@ export class VaultEntry{
     url:string
     @Prop({required:true})
     password:string
+    @Prop({required:true,default:'None'})
+    folder:string
 }
 @Schema()
 export class Vault{

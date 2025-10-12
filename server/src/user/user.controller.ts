@@ -24,6 +24,7 @@ return userData;
 
 @Post('/AddvaultData')
 async AddData(@Body() VaultInfO:vaultData):Promise<void>{
+    console.log(VaultInfO)
     const response=this.UserVault.AddEntry(VaultInfO);
     return;
 }

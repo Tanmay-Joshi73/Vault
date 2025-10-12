@@ -8,10 +8,10 @@ import { Types } from 'mongoose';
 import { NotFoundException } from '@nestjs/common';
 import { log } from 'node:console';
 interface VaultInfo{
-    website:string,
-    username:string,
+    encryptedWebsite:string,
+    encryptedUsername:string,
     encryptedPassword:string,
-    folder:string,
+    encryptedFolder:string,
     email:string
 }
 @Injectable()
@@ -57,6 +57,7 @@ async findVaultEntry(email: string): Promise<any> {
         username: e.username,
         url: e.url,
         password: e.password,
+        folder:e.folder
       })),
     };
   } catch (error) {
@@ -67,7 +68,7 @@ async findVaultEntry(email: string): Promise<any> {
 
 async AddEntry(vaultData: VaultInfo): Promise<any> {
   try {
-    const { username, website, folder, encryptedPassword, email } = vaultData;
+    const { encryptedUsername, encryptedWebsite, encryptedFolder, encryptedPassword, email } = vaultData;
 
     const ExistingUser = await this.UserInfo.findOne({ email });
     if (!ExistingUser) throw new NotFoundException("user not found");
@@ -84,10 +85,10 @@ async AddEntry(vaultData: VaultInfo): Promise<any> {
     }
 
     vaultEntry.Entries.push({
-      username,
-      url: website,
+      username:encryptedUsername,
+      url: encryptedWebsite,
       password: encryptedPassword,
-    //   folder:folder
+      folder:encryptedFolder
     });
 
     await vaultEntry.save();
