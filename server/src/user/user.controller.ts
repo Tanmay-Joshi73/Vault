@@ -1,4 +1,4 @@
-import { Controller, Inject,Param } from '@nestjs/common';
+import { Controller, Delete, Inject,Param } from '@nestjs/common';
 import { Body,Post,Get } from '@nestjs/common';
 import { InjectModel, } from '@nestjs/mongoose';
 import { User,UserSchema } from './Schemas/user.schema';
@@ -8,7 +8,13 @@ import { UserService } from './user.service';
 import { vaultData } from 'src/auth/DTOs/vaultData.dto';
 import { log } from 'node:console';
 import { Query } from '@nestjs/common';
+export interface DelData{
+    email: string;
+  credentialId: string;
+}
+
 @Controller('user')
+
 export class UserController {
     constructor(private readonly UserVault:UserService){}
 
@@ -28,5 +34,9 @@ async AddData(@Body() VaultInfO:vaultData):Promise<void>{
     const response=this.UserVault.AddEntry(VaultInfO);
     return;
 }
-
+@Delete('/DeletevaultData')
+async DeleteData(@Body() DT:DelData):Promise<{Success:boolean}>{
+    const response=this.UserVault.DeleteEntry(DT);
+    return {Success:true}
+}
 }

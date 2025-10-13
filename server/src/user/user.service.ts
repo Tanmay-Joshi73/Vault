@@ -7,6 +7,7 @@ import { Model } from 'mongoose';
 import { Types } from 'mongoose';
 import { NotFoundException } from '@nestjs/common';
 import { log } from 'node:console';
+import { DelData } from './user.controller';
 interface VaultInfo{
     encryptedWebsite:string,
     encryptedUsername:string,
@@ -36,35 +37,45 @@ async findVaultEntry(email: string): Promise<any> {
 
     // 2️⃣ Find the vault document for that user
     const vault = await this.UserData.findOne({ user: userId })
-      .populate("user") // optional, adds email to response
+      .populate("user")
       .exec();
 
-    // 3️⃣ If vault doesn’t exist
+    // 3️⃣ If vault doesn't exist
     if (!vault) {
       console.log("⚠️ Vault not found for this user");
       return {
-        message: "Vault not found for this user",
-        entries: [],
+        success: true,  // Frontend expects success: true
+        data: []        // Frontend expects data array
       };
     }
-    console.log(vault);
+
+    console.log("📦 Raw vault data:", vault);
     
-    // 4️⃣ Return formatted entries
+    // 4️⃣ Return entries in the format frontend expects
     return {
-      message: "Vault entries fetched successfully",
-      totalEntries: vault.Entries.length,
-      entries: vault.Entries.map((e) => ({
-        username: e.username,
-        url: e.url,
-        password: e.password,
-        folder:e.folder
-      })),
+           success: true,  // ✅ CRITICAL: Frontend checks this
+// Important: frontend checks response.data.success
+      data: vault.Entries.map((entry) => ({
+        id: ExistingUser._id.toString(), // Frontend needs id
+        encryptedWebsite:  entry.url, // Handle both encrypted and plain
+        encryptedUsername: entry.username,
+        encryptedPassword:  entry.password,
+        encryptedUrl:  entry.url,
+        encryptedFolder: entry.folder,
+        
+        createdAt: new Date().toISOString(),
+        updatedAt:  new Date().toISOString(),
+        email: email
+      }))
     };
   } catch (error) {
     console.error("❌ Error while fetching vault entries:", error);
-    throw new Error("Failed to fetch vault entries");
+    return {
+      success: false,
+      message: "Failed to fetch vault entries"
+    };
   }
-}
+}s
 
 async AddEntry(vaultData: VaultInfo): Promise<any> {
   try {
@@ -99,5 +110,48 @@ async AddEntry(vaultData: VaultInfo): Promise<any> {
     throw error;
   }
 }
+
+async DeleteEntry(DT:DelData):Promise<any>{
+try {
+
+    // 1️⃣ Find the user by email
+    
+    const {email,credentialId}={...DT};
+
+    const existingUser = await this.UserInfo.findOne({email:email});
+    if (!existingUser) {
+      console.log("⚠️ User not found");
+      return {
+        success: false,
+        message: "User not found"
+      };
+    }
+    console.log(existingUser);
+    const userId = existingUser._id;
+    console.log('user id ',userId);
+    console.log('entry id ',credentialId)
+    const result=await this.UserData.updateOne(
+      {user:userId},
+      {$pull:{Entries:{_id:credentialId}}}
+    );
+    if(result.modifiedCount==0){
+      console.log("Nothing present in the database");
+         return {
+        success: false,
+        message: "Credential entry not found"
+      };
+    }
+      console.log("✅ Credential deleted successfully");
+    return {
+      success: true,
+      message: "Credential deleted successfully"
+    };
 }
+catch(err){
+  
+  console.log(err)
+}
+}
+}
+
 
