@@ -1,13 +1,13 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import * as compression from 'compression';
+// import * as compression from 'compression';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   // Compression
-  app.use(compression({ threshold: 1024 }));
+  // app.use(compression({ threshold: 1024 }));
 
   // CORS
   app.enableCors({
