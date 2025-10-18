@@ -1,8 +1,10 @@
 import { Prop,Schema,SchemaFactory } from "@nestjs/mongoose";
 import { Document,Types } from "mongoose";
 import { User } from "./user.schema";
-@Schema()
+@Schema({_id:true})
 export class VaultEntry{
+    [x: string]: any;
+    _id?: Types.ObjectId;
     @Prop({required:true})
     username:string
     @Prop({required:true})

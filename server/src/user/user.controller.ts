@@ -1,4 +1,4 @@
-import { Controller, Delete, Inject,Param } from '@nestjs/common';
+import { Controller, Delete, Inject,Param, Patch } from '@nestjs/common';
 import { Body,Post,Get } from '@nestjs/common';
 import { InjectModel, } from '@nestjs/mongoose';
 import { User,UserSchema } from './Schemas/user.schema';
@@ -33,6 +33,11 @@ async AddData(@Body() VaultInfO:vaultData):Promise<void>{
     console.log(VaultInfO)
     const response=this.UserVault.AddEntry(VaultInfO);
     return;
+}
+@Patch('/updateData')
+async EditData(@Body() VaultInfO:vaultData):Promise<void>{
+console.log("This route is Got hitted");
+
 }
 @Delete('/DeletevaultData')
 async DeleteData(@Body() DT:DelData):Promise<{Success:boolean}>{

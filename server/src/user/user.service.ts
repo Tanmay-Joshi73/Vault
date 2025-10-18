@@ -27,7 +27,7 @@ async findVaultEntry(email: string): Promise<any> {
     console.log("🔍 Fetching vault entries for:", email);
 
     // 1️⃣ Find the user by email
-    const ExistingUser = await this.UserInfo.findOne({ email });
+    const ExistingUser = await this.UserInfo.findOne({ email }).select('+_id');
     if (!ExistingUser) {
       console.log("⚠️ User not found");
       throw new NotFoundException("User not found");
@@ -49,20 +49,22 @@ async findVaultEntry(email: string): Promise<any> {
       };
     }
 
-    console.log("📦 Raw vault data:", vault);
+    // console.log(vault.Entries);
+    
+    
     
     // 4️⃣ Return entries in the format frontend expects
     return {
            success: true,  // ✅ CRITICAL: Frontend checks this
 // Important: frontend checks response.data.success
-      data: vault.Entries.map((entry) => ({
-        id: ExistingUser._id.toString(), // Frontend needs id
+        data: vault.Entries.map((entry) => ({
+        id: entry._id, // Frontend needs id
         encryptedWebsite:  entry.url, // Handle both encrypted and plain
         encryptedUsername: entry.username,
         encryptedPassword:  entry.password,
         encryptedUrl:  entry.url,
         encryptedFolder: entry.folder,
-        
+        encryptedid:entry._id,
         createdAt: new Date().toISOString(),
         updatedAt:  new Date().toISOString(),
         email: email
@@ -95,6 +97,7 @@ async AddEntry(vaultData: VaultInfo): Promise<any> {
       });
     }
 
+    const VaultEntry
     vaultEntry.Entries.push({
       username:encryptedUsername,
       url: encryptedWebsite,
@@ -103,6 +106,7 @@ async AddEntry(vaultData: VaultInfo): Promise<any> {
     });
 
     await vaultEntry.save();
+
     console.log("Entries saved to the database successfully!");
     return vaultEntry;
   } catch (error) {
@@ -117,8 +121,8 @@ try {
     // 1️⃣ Find the user by email
     
     const {email,credentialId}={...DT};
-
-    const existingUser = await this.UserInfo.findOne({email:email});
+    
+      const existingUser = await this.UserInfo.findOne({email:email});
     if (!existingUser) {
       console.log("⚠️ User not found");
       return {

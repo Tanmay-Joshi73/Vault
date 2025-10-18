@@ -22,14 +22,12 @@ import { encryptData, decryptData } from '../../lib/encryption';
 import { toast } from 'sonner';
 import type { Credential, EncryptedCredential, ViewMode, SortOption } from '../../Types/vault';
 import { Lock, X, Check, ArrowBigDownIcon } from 'lucide-react';
-import ResponseCache from 'next/dist/server/response-cache';
 
 // API endpoints
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 const GetvaultData = `${API_BASE_URL}/user/getVaultData/Email`;
 const PostvaultData = `${API_BASE_URL}/user/AddvaultData`;
 const DeleteVaultData = `${API_BASE_URL}/user/DeletevaultData`;
-const updateVaultData= `${API_BASE_URL}/user/updateData`;
 
 const Vault = () => {
   const router = useRouter();
@@ -92,11 +90,8 @@ const fetchCredentials = async () => {
     } else if (response.data.entries !== undefined) {
       // Old format: { message: ..., totalEntries: ..., entries: [...] }
       success = true; // Assume success if we have entries
-    ;
-      console.log("responce of Fetch url",response.data.entries)  
-
       encryptedCredentials = response.data.entries.map((entry, index) => ({
-        id: entry._id?.toString(),
+        id: entry._id?.toString() || `temp-${index}`,
         encryptedWebsite: entry.encryptedWebsite || entry.website,
         encryptedUsername: entry.encryptedUsername || entry.username,
         encryptedPassword: entry.encryptedPassword || entry.password,
@@ -125,7 +120,7 @@ const fetchCredentials = async () => {
             encryptedCred.encryptedFolder ? decryptField(encryptedCred.encryptedFolder) : Promise.resolve(''),
             encryptedCred.encryptedNotes ? decryptField(encryptedCred.encryptedNotes) : Promise.resolve(''),
           ]);
-          console.log("Encrypted ID for the particular user ",encryptedCred.id)
+
           const decryptedCred: Credential = {
             id: encryptedCred.id,
             website,
@@ -195,7 +190,7 @@ const fetchCredentials = async () => {
   };
 
   const handleSaveCredential = async (credential: Credential) => {
-    const tempId =  credential.id;
+    const tempId = editingCredential ? credential.id : `temp-${Date.now()}`;
     const optimisticCredential: Credential = {
       ...credential,
       id: tempId,
@@ -220,7 +215,7 @@ const fetchCredentials = async () => {
       
       if (editingCredential) {
         // Update existing credential
-        response = await axios.patch(
+        response = await axios.put(
           `${CREDENTIALS_API}/${credential.id}`,
           encryptedCredential,
           {
@@ -242,10 +237,9 @@ const fetchCredentials = async () => {
         );
       }
 
-      if (response.data.success) {  
-        console.log('Responce after adding new data ',response.data)
+      if (response.data.success) {
         const savedEncryptedCredential: EncryptedCredential = response.data.data;
-        // await fetchCredentials()
+        
         // Decrypt the saved credential for UI
         try {
           const [
@@ -293,7 +287,6 @@ const fetchCredentials = async () => {
         setEditingCredential(undefined);
         setDialogOpen(false);
         toast.success(`Credential ${editingCredential ? 'updated' : 'added'} successfully`);
-        await fetchCredentials()
       } else {
         toast.error(`Failed to ${editingCredential ? 'update' : 'add'} credential`);
       }
@@ -318,15 +311,12 @@ const fetchCredentials = async () => {
   };
   
   const handleDelete = async (id: string) => {
+    console.log(id)
   if (!confirm('Are you sure you want to delete this credential?')) {
     return
   }
 
   try {
-    console.log(id);
-    console.log(credentials);
-    
-    
     const response = await axios.delete(DeleteVaultData, {
       data: {
         email: userId.Email,
@@ -340,7 +330,6 @@ const fetchCredentials = async () => {
     if (response.data.success) {
       setCredentials(prev => prev.filter(c => c.id !== id));
       toast.success('Credential deleted successfully');
-      await fetchCredentials();
     } else {
       toast.error(response.data.message || 'Failed to delete credential');
     }
