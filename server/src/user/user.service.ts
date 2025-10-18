@@ -77,7 +77,7 @@ async findVaultEntry(email: string): Promise<any> {
       message: "Failed to fetch vault entries"
     };
   }
-}s
+}
 
 async AddEntry(vaultData: VaultInfo): Promise<any> {
   try {
