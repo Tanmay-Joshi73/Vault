@@ -70,7 +70,6 @@ const Vault = () => {
 const fetchCredentials = async () => {
   try {
     setLoading(true);
-    console.log('🔄 Fetching credentials for:', userId.Email);
     
     const response = await axios.get(GetvaultData, {
       params: { Email: userId.Email },
@@ -79,7 +78,6 @@ const fetchCredentials = async () => {
       },
     });
 
-    console.log('📨 Backend response:', response.data);
 
     // TEMPORARY FIX: Handle both response formats
     let encryptedCredentials = [];
@@ -93,7 +91,6 @@ const fetchCredentials = async () => {
       // Old format: { message: ..., totalEntries: ..., entries: [...] }
       success = true; // Assume success if we have entries
     ;
-      console.log("responce of Fetch url",response.data.entries)  
 
       encryptedCredentials = response.data.entries.map((entry, index) => ({
         id: entry._id?.toString(),
@@ -109,7 +106,6 @@ const fetchCredentials = async () => {
       }));
     }
 
-    console.log('✅ Processed credentials:', { success, count: encryptedCredentials.length });
 
     if (success && encryptedCredentials.length > 0) {
       // Decrypt all credentials (your existing decryption logic)
@@ -125,7 +121,6 @@ const fetchCredentials = async () => {
             encryptedCred.encryptedFolder ? decryptField(encryptedCred.encryptedFolder) : Promise.resolve(''),
             encryptedCred.encryptedNotes ? decryptField(encryptedCred.encryptedNotes) : Promise.resolve(''),
           ]);
-          console.log("Encrypted ID for the particular user ",encryptedCred.id)
           const decryptedCred: Credential = {
             id: encryptedCred.id,
             website,
@@ -145,7 +140,6 @@ const fetchCredentials = async () => {
         }
       }
 
-      console.log('🎉 Final decrypted credentials:', decryptedCredentials);
       setCredentials(decryptedCredentials);
     } else if (success && encryptedCredentials.length === 0) {
       console.log('📭 No credentials found');
@@ -220,8 +214,9 @@ const fetchCredentials = async () => {
       
       if (editingCredential) {
         // Update existing credential
+        console.log('sending the data for updating the vaules',encryptedCredential)
         response = await axios.patch(
-          `${CREDENTIALS_API}/${credential.id}`,
+          `${updateVaultData}`,
           encryptedCredential,
           {
             headers: {
@@ -243,8 +238,7 @@ const fetchCredentials = async () => {
       }
 
       if (response.data.success) {  
-        console.log('Responce after adding new data ',response.data)
-        const savedEncryptedCredential: EncryptedCredential = response.data.data;
+        const savedEncryptedCredential: EncryptedCredential = response.data.vault;
         // await fetchCredentials()
         // Decrypt the saved credential for UI
         try {
@@ -323,8 +317,7 @@ const fetchCredentials = async () => {
   }
 
   try {
-    console.log(id);
-    console.log(credentials);
+
     
     
     const response = await axios.delete(DeleteVaultData, {

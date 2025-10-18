@@ -6,7 +6,6 @@ import { UserModule } from './user/user.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Throttle,ThrottlerGuard,ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
-import { LlmModule } from './llm/llm.module';
 @Module({
   imports: [AuthModule, UserModule,
     MongooseModule.forRoot("mongodb+srv://tanmayjoshi072_db_user:L5bdMXoS55yUOYx2@vaultcluster.7q3th0j.mongodb.net/"),
@@ -28,7 +27,7 @@ import { LlmModule } from './llm/llm.module';
       }
     ]
     ),
-    LlmModule 
+    
   ],
   controllers: [AppController],
   providers: [AppService,

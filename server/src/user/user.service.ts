@@ -7,7 +7,7 @@ import { Model } from 'mongoose';
 import { Types } from 'mongoose';
 import { NotFoundException } from '@nestjs/common';
 import { log } from 'node:console';
-import { DelData } from './user.controller';
+import { DelData, Updata } from './user.controller';
 interface VaultInfo{
     encryptedWebsite:string,
     encryptedUsername:string,
@@ -97,8 +97,9 @@ async AddEntry(vaultData: VaultInfo): Promise<any> {
       });
     }
 
-    const VaultEntry
+    // const VaultEntry
     vaultEntry.Entries.push({
+      _id:new Types.ObjectId(),
       username:encryptedUsername,
       url: encryptedWebsite,
       password: encryptedPassword,
@@ -109,6 +110,7 @@ async AddEntry(vaultData: VaultInfo): Promise<any> {
 
     console.log("Entries saved to the database successfully!");
     return vaultEntry;
+
   } catch (error) {
     console.error("Error while adding entry:", error);
     throw error;
@@ -156,6 +158,46 @@ catch(err){
   console.log(err)
 }
 }
+
+
+async update(vaultData: Updata): Promise<any> {
+    const { email, id, encryptedUsername, encryptedWebsite, encryptedUrl, encryptedPassword, encryptedFolder, notes } = vaultData;
+    if (!id) throw new NotFoundException('Entry ID is required for update');
+
+    // 1️⃣ Find the user
+    const existingUser = await this.UserInfo.findOne({ email });
+    if (!existingUser) throw new NotFoundException('User not found');
+    
+    // 2️⃣ Find the user's vault
+    const vault = await this.UserData.findOne({ user: existingUser._id });
+
+    
+    if (!vault) throw new NotFoundException('Vault not found');
+
+    // 3️⃣ Find the specific entry in vault.Entries by id
+    const entryIndex = vault.Entries.findIndex(
+      (entry) => entry._id?.toString() === id
+    );
+    
+    
+    if (entryIndex === -1) throw new NotFoundException('Vault entry not found');
+
+    // 4️⃣ Update only the provided fields
+    if (encryptedUsername !== undefined) vault.Entries[entryIndex].username = encryptedUsername;
+    if (encryptedWebsite !== undefined) vault.Entries[entryIndex].website = encryptedWebsite;
+    if (encryptedUrl !== undefined) vault.Entries[entryIndex].url = encryptedUrl;
+    if (encryptedPassword !== undefined) vault.Entries[entryIndex].password = encryptedPassword;
+    if (encryptedFolder !== undefined) vault.Entries[entryIndex].folder = encryptedFolder;
+
+    // 5️⃣ Save the updated vault
+    await vault.save();
+    
+    
+    
+    // 6️⃣ Return the updated entry to frontend
+    return vault.Entries[entryIndex];
+  }
 }
+
 
 
